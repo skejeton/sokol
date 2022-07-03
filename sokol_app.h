@@ -1616,6 +1616,7 @@ inline void sapp_run(const sapp_desc& desc) { return sapp_run(&desc); }
 #include <stdlib.h> // malloc, free
 #include <string.h> // memset
 #include <stddef.h> // size_t
+#include <math.h>   // trunc
 
 /* check if the config defines are alright */
 #if defined(__APPLE__)
@@ -1967,11 +1968,12 @@ _SOKOL_PRIVATE void _sapp_timestamp_init(_sapp_timestamp_t* ts) {
     #endif
 }
 
+// return current time in ns
 _SOKOL_PRIVATE double _sapp_timestamp_now(_sapp_timestamp_t* ts) {
     #if defined(_SAPP_APPLE)
         const uint64_t traw = mach_absolute_time() - ts->mach.start;
         const uint64_t now = (uint64_t) _sapp_int64_muldiv((int64_t)traw, (int64_t)ts->mach.timebase.numer, (int64_t)ts->mach.timebase.denom);
-        return (double)now / 1000000000.0;
+        return (double)now;
     #elif defined(_SAPP_EMSCRIPTEN)
         (void)ts;
         SOKOL_ASSERT(false);
@@ -1980,68 +1982,58 @@ _SOKOL_PRIVATE double _sapp_timestamp_now(_sapp_timestamp_t* ts) {
         LARGE_INTEGER qpc;
         QueryPerformanceCounter(&qpc);
         const uint64_t now = (uint64_t)_sapp_int64_muldiv(qpc.QuadPart - ts->win.start.QuadPart, 1000000000, ts->win.freq.QuadPart);
-        return (double)now / 1000000000.0;
+        return (double)now;
     #else
         struct timespec tspec;
         clock_gettime(_SAPP_CLOCK_MONOTONIC, &tspec);
         const uint64_t now = ((uint64_t)tspec.tv_sec*1000000000 + (uint64_t)tspec.tv_nsec) - ts->posix.start;
-        return (double)now / 1000000000.0;
+        return (double)now;
     #endif
 }
 
 typedef struct {
-    double last;
-    double accum;
+    double x[3];
+    double y[3];
     double avg;
-    int spike_count;
-    int num;
+    double last;
     _sapp_timestamp_t timestamp;
-    _sapp_ring_t ring;
 } _sapp_timing_t;
 
+// see https://gist.github.com/slembcke/b2ff9427472eee36caa01fafcbf5773a
 _SOKOL_PRIVATE void _sapp_timing_reset(_sapp_timing_t* t) {
+    // FIXME: ideally the filter would be initialized with the display refresh rate
+    double init_60hz = 1.6e7;
+    for (int i = 0; i < 3; i++) {
+        t->x[i] = t->y[i] = init_60hz;
+    }
+    t->avg = init_60hz;
     t->last = 0.0;
-    t->accum = 0.0;
-    t->spike_count = 0;
-    t->num = 0;
-    _sapp_ring_init(&t->ring);
 }
 
 _SOKOL_PRIVATE void _sapp_timing_init(_sapp_timing_t* t) {
-    t->avg = 1.0 / 60.0;    // dummy value until first actual value is available
     _sapp_timing_reset(t);
     _sapp_timestamp_init(&t->timestamp);
 }
 
-_SOKOL_PRIVATE void _sapp_timing_put(_sapp_timing_t* t, double dur) {
-    // arbitrary upper limit to ignore outliers (e.g. during window resizing, or debugging)
-    double min_dur = 0.0;
-    double max_dur = 0.1;
-    // if we have enough samples for a useful average, use a much tighter 'valid window'
-    if (_sapp_ring_full(&t->ring)) {
-        min_dur = t->avg * 0.8;
-        max_dur = t->avg * 1.2;
+_SOKOL_PRIVATE void _sapp_timing_put(_sapp_timing_t* t, double dt_nanos) {
+    // IIR filter coefficients. 2rd order lowpass butterworth at 1/128 the sample rate.
+    static const double b[] = {0.00014802198653182094, 0.0002960439730636419, 0.00014802198653182094};
+    static const double a[] = {1.0, -1.9652933726226902, 0.9658854605688174};
+
+    // FIXME: drop obvious outliers (e.g. caused by window resizing)
+
+    // apply IIR filter coefficients.
+    double value = b[0]*dt_nanos;
+    for(int i = 2; i > 0; i--){
+        t->x[i] = t->x[i - 1];
+        t->y[i] = t->y[i - 1];
+        value += b[i] * t->x[i] - a[i] * t->y[i];
     }
-    if ((dur < min_dur) || (dur > max_dur)) {
-        t->spike_count++;
-        // if there have been many spikes in a row, the display refresh rate
-        // might have changed, so a timing reset is needed
-        if (t->spike_count > 20) {
-            _sapp_timing_reset(t);
-        }
-        return;
-    }
-    if (_sapp_ring_full(&t->ring)) {
-        double old_val = _sapp_ring_dequeue(&t->ring);
-        t->accum -= old_val;
-        t->num -= 1;
-    }
-    _sapp_ring_enqueue(&t->ring, dur);
-    t->accum += dur;
-    t->num += 1;
-    SOKOL_ASSERT(t->num > 0);
-    t->avg = t->accum / t->num;
-    t->spike_count = 0;
+    t->x[0] = dt_nanos;
+    t->y[0] = value;
+
+    // quantize the delta time, truncating towards the filtered value.
+    t->avg = trunc(dt_nanos/value - 1) * value + value;
 }
 
 _SOKOL_PRIVATE void _sapp_timing_discontinuity(_sapp_timing_t* t) {
@@ -2057,15 +2049,15 @@ _SOKOL_PRIVATE void _sapp_timing_measure(_sapp_timing_t* t) {
     t->last = now;
 }
 
-_SOKOL_PRIVATE void _sapp_timing_external(_sapp_timing_t* t, double now) {
+_SOKOL_PRIVATE void _sapp_timing_external(_sapp_timing_t* t, double now_ns) {
     if (t->last > 0.0) {
-        double dur = now - t->last;
+        double dur = now_ns - t->last;
         _sapp_timing_put(t, dur);
     }
-    t->last = now;
+    t->last = now_ns;
 }
 
-_SOKOL_PRIVATE double _sapp_timing_get_avg(_sapp_timing_t* t) {
+_SOKOL_PRIVATE double _sapp_timing_get_avg_ns(_sapp_timing_t* t) {
     return t->avg;
 }
 
@@ -5399,7 +5391,7 @@ _SOKOL_PRIVATE void _sapp_emsc_unregister_eventhandlers() {
 
 _SOKOL_PRIVATE EM_BOOL _sapp_emsc_frame(double time, void* userData) {
     _SOKOL_UNUSED(userData);
-    _sapp_timing_external(&_sapp.timing, time / 1000.0);
+    _sapp_timing_external(&_sapp.timing, time * 1000000.0);
 
     #if defined(SOKOL_WGPU)
         /*
@@ -6631,7 +6623,7 @@ _SOKOL_PRIVATE void _sapp_win32_timing_measure(void) {
                     _sapp.d3d11.sync_refresh_count = dxgi_stats.SyncRefreshCount;
                     LARGE_INTEGER qpc = dxgi_stats.SyncQPCTime;
                     const uint64_t now = (uint64_t)_sapp_int64_muldiv(qpc.QuadPart - _sapp.timing.timestamp.win.start.QuadPart, 1000000000, _sapp.timing.timestamp.win.freq.QuadPart);
-                    _sapp_timing_external(&_sapp.timing, (double)now / 1000000000.0);
+                    _sapp_timing_external(&_sapp.timing, (double)now);
                 }
                 return;
             }
@@ -11335,7 +11327,7 @@ SOKOL_API_IMPL uint64_t sapp_frame_count(void) {
 }
 
 SOKOL_API_IMPL double sapp_frame_duration(void) {
-    return _sapp_timing_get_avg(&_sapp.timing);
+    return _sapp_timing_get_avg_ns(&_sapp.timing) / 1000000000.0;
 }
 
 SOKOL_API_IMPL int sapp_width(void) {
