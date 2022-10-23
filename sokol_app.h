@@ -8699,6 +8699,205 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 /*== Android ================================================================*/
 #if defined(_SAPP_ANDROID)
 
+//=== JNI C vs C++ WRAPPERS
+_SOKOL_PRIVATE jint _sapp_android_JavaVM_GetEnv(JavaVM* self, void** env, jint version) {
+    #if defined(__cplusplus)
+        return self->GetEnv(env, version);
+    #else
+        return (*self)->GetEnv(self, env, version);
+    #endif
+}
+
+_SOKOL_PRIVATE jint _sapp_android_JavaVM_AttachCurrentThread(JavaVM* self, JNIEnv** p_env, void* thr_args) {
+    #if defined(__cplusplus)
+        return self->AttachCurrentThread(p_env, thr_args);
+    #else
+        return (*self)->AttachCurrentThread(self, p_env, thr_args);
+    #endif
+}
+
+_SOKOL_PRIVATE void _sapp_android_JavaVM_DetachCurrentThread(JavaVM* self) {
+    #if defined(__cplusplus)
+        self->DetachCurrentThread();
+    #else
+        (*self)->DetachCurrentThread(self);
+    #endif
+}
+
+_SOKOL_PRIVATE jclass _sapp_android_JNIEnv_FindClass(JNIEnv* self, const char* name) {
+    #if defined(__cplusplus)
+        return self->FindClass(name);
+    #else
+        return (*self)->FindClass(self, name);
+    #endif
+}
+
+_SOKOL_PRIVATE jmethodID _sapp_android_JNIEnv_GetMethodID(JNIEnv* self, jclass clazz, const char* name, const char* sig) {
+    #if defined(__cplusplus)
+        return self->GetMethodID(clazz, name, sig);
+    #else
+        return (*self)->GetMethodID(self, clazz, name, sig);
+    #endif
+}
+
+_SOKOL_PRIVATE jboolean _sapp_android_JNIEnv_CallBooleanMethod(JNIEnv* self, jobject obj, jmethodID methodID, ...) {
+    va_list args;
+    va_start(args, methodID);
+    #if defined(__cplusplus)
+        jboolean res = self->CallBooleanMethodV(obj, methodID, args);
+    #else
+        jboolean res = (*self)->CallBooleanMethodV(self, obj, methodID, args);
+    #endif
+    va_end(args);
+    return res;
+}
+
+_SOKOL_PRIVATE jobject _sapp_android_JNIEnv_CallObjectMethod(JNIEnv* self, jobject obj, jmethodID methodID, ...) {
+    va_list args;
+    va_start(args, methodID);
+    #if defined(__cplusplus)
+        jobject res = self->CallObjectMethodV(obj, methodID, args);
+    #else
+        jobject res = (*self)->CallObjectMethodV(self, obj, methodID, args);
+    #endif
+    va_end(args);
+    return res;
+}
+
+_SOKOL_PRIVATE void _sapp_android_JNIEnv_CallVoidMethod(JNIEnv* self, jobject obj, jmethodID methodID, ...) {
+    va_list args;
+    va_start(args, methodID);
+    #if defined(__cplusplus)
+        return self->CallVoidMethodV(obj, methodID, args);
+    #else
+        return (*self)->CallVoidMethodV(self, obj, methodID, args);
+    #endif
+    va_end(args);
+}
+
+_SOKOL_PRIVATE jint _sapp_android_JNIEnv_CallIntMethod(JNIEnv* self, jobject obj, jmethodID methodID, ...) {
+    va_list args;
+    va_start(args, methodID);
+    #if defined(__cplusplus)
+        jint res = self->CallIntMethodV(obj, methodID, args);
+    #else
+        jint res = (*self)->CallIntMethodV(self, obj, methodID, args);
+    #endif
+    va_end(args);
+    return res;
+}
+
+_SOKOL_PRIVATE jobject _sapp_android_JNIEnv_CallStaticObjectMethod(JNIEnv* self, jclass clazz, jmethodID methodID, ...) {
+    va_list args;
+    va_start(args, methodID);
+    #if defined(__cplusplus)
+        jobject res = self->CallStaticObjectMethodV(clazz, methodID, args);
+    #else
+        jobject res = (*self)->CallStaticObjectMethodV(self, clazz, methodID, args);
+    #endif
+    va_end(args);
+    return res;
+}
+
+_SOKOL_PRIVATE void _sapp_android_JNIEnv_DeleteLocalRef(JNIEnv* self, jobject obj) {
+    #if defined(__cplusplus)
+        self->DeleteLocalRef(obj);
+    #else
+        (*self)->DeleteLocalRef(self, obj);
+    #endif
+}
+
+_SOKOL_PRIVATE void _sapp_android_JNIEnv_DeleteGlobalRef(JNIEnv* self, jobject obj) {
+    #if defined(__cplusplus)
+        self->DeleteGlobalRef(obj);
+    #else
+        (*self)->DeleteGlobalRef(self, obj);
+    #endif
+}
+
+_SOKOL_PRIVATE jobject _sapp_android_JNIEnv_NewObject(JNIEnv* self, jclass clazz, jmethodID methodID, ...) {
+    va_list args;
+    va_start(args, methodID);
+    #if defined(__cplusplus)
+        return self->NewObjectV(clazz, methodID, args);
+    #else
+        return (*self)->NewObjectV(self, clazz, methodID, args);
+    #endif
+    va_end(args);
+}
+
+_SOKOL_PRIVATE jfieldID _sapp_android_JNIEnv_GetFieldID(JNIEnv* self, jclass clazz, const char* name, const char* sig) {
+    #if defined(__cplusplus)
+        return self->GetFieldID(clazz, name, sig);
+    #else
+        return (*self)->GetFieldID(self, clazz, name, sig);
+    #endif
+}
+
+_SOKOL_PRIVATE jint _sapp_android_JNIEnv_GetIntField(JNIEnv* self, jobject obj, jfieldID fieldID) {
+    #if defined(__cplusplus)
+        return self->GetIntField(obj, fieldID);
+    #else
+        return (*self)->GetIntField(self, obj, fieldID);
+    #endif
+}
+
+_SOKOL_PRIVATE jfieldID _sapp_android_JNIEnv_GetStaticFieldID(JNIEnv* self, jclass clazz, const char* name, const char* sig) {
+    #if defined(__cplusplus)
+        return self->GetStaticFieldID(clazz, name, sig);
+    #else
+        return (*self)->GetStaticFieldID(self, clazz, name, sig);
+    #endif
+}
+
+_SOKOL_PRIVATE jobject _sapp_android_JNIEnv_GetStaticObjectField(JNIEnv* self, jclass clazz, jfieldID fieldID) {
+    #if defined(__cplusplus)
+        return self->GetStaticObjectField(clazz, fieldID);
+    #else
+        return (*self)->GetStaticObjectField(self, clazz, fieldID);
+    #endif
+}
+
+_SOKOL_PRIVATE jmethodID _sapp_android_JNIEnv_GetStaticMethodID(JNIEnv* self, jclass clazz, const char* name, const char* sig) {
+    #if defined(__cplusplus)
+        return self->GetStaticMethodID(clazz, name, sig);
+    #else
+        return (*self)->GetStaticMethodID(self, clazz, name, sig);
+    #endif
+}
+
+_SOKOL_PRIVATE jobject _sapp_android_JNIEnv_NewGlobalRef(JNIEnv* self, jobject obj) {
+    #if defined(__cplusplus)
+        return self->NewGlobalRef(obj);
+    #else
+        return (*self)->NewGlobalRef(self, obj);
+    #endif
+}
+
+_SOKOL_PRIVATE jstring _sapp_android_JNIEnv_NewStringUTF(JNIEnv* self, const char* str) {
+    #if defined(__cplusplus)
+        return self->NewStringUTF(str);
+    #else
+        return (*self)->NewStringUTF(self, str);
+    #endif
+}
+
+_SOKOL_PRIVATE const char* _sapp_android_JNIEnv_GetStringUTFChars(JNIEnv* self, jstring str, jboolean* isCopy) {
+    #if defined(__cplusplus)
+        return self->GetStringUTFChars(str, isCopy);
+    #else
+        return (*self)->GetStringUTFChars(self, str, isCopy);
+    #endif
+}
+
+_SOKOL_PRIVATE void _sapp_android_JNIEnv_ReleaseStringUTFChars(JNIEnv* self, jstring str, const char* utf) {
+    #if defined(__cplusplus)
+        self->ReleaseStringUTFChars(str, utf);
+    #else
+        (*self)->ReleaseStringUTFChars(self, str, utf);
+    #endif
+}
+
 _SOKOL_PRIVATE void _sapp_android_init_keytable(void) {
     _sapp.keycodes[AKEYCODE_UNKNOWN]            = SAPP_KEYCODE_INVALID;
     _sapp.keycodes[AKEYCODE_SPACE]              = SAPP_KEYCODE_SPACE;
@@ -9302,20 +9501,18 @@ _SOKOL_PRIVATE bool _sapp_android_get_jni_env(JNIEnv **env) {
     JavaVM *vm = _sapp.android.activity->vm;
     *env = NULL;
 
-    if ((*vm)->GetEnv(vm, (void**)env, JNI_VERSION_1_6) == JNI_OK) {
+    if (_sapp_android_JavaVM_GetEnv(vm, (void**)env, JNI_VERSION_1_6) == JNI_OK) {
         return false;
     }
 
-    JavaVMAttachArgs args = {
-        .version  = JNI_VERSION_1_6,
-        .name = "NativeThread",
-        .group = NULL
-    };
-
-    if ((*vm)->AttachCurrentThread(vm, env, &args) != JNI_OK) {
+    JavaVMAttachArgs args;
+    _sapp_clear(&args, sizeof(args));
+    args.version  = JNI_VERSION_1_6;
+    args.name = "NativeThread";
+    args.group = NULL;
+    if (_sapp_android_JavaVM_AttachCurrentThread(vm, env, &args) != JNI_OK) {
         return false;
     }
-
     return true;
 }
 
@@ -9328,77 +9525,32 @@ _SOKOL_PRIVATE void _sapp_android_show_keyboard(bool shown) {
         return;
     }
 
-    jclass input_method_manager_class = (*env)->FindClass(
-        env,
-        "android/view/inputmethod/InputMethodManager"
-        );
-    jclass view_class = (*env)->FindClass(env, "android/view/View");
+    jclass input_method_manager_class = _sapp_android_JNIEnv_FindClass(env, "android/view/inputmethod/InputMethodManager");
+    jclass view_class = _sapp_android_JNIEnv_FindClass(env, "android/view/View");
 
     if (shown) {
         // decor_view.requestFocus();
-        jmethodID request_focus = (*env)->GetMethodID(
-            env,
-            view_class,
-            "requestFocus",
-            "()Z"
-            );
-        (*env)->CallBooleanMethod(
-            env,
-            _sapp.android.decor_view,
-            request_focus
-            );
+        jmethodID request_focus = _sapp_android_JNIEnv_GetMethodID(env, view_class, "requestFocus", "()Z");
+        _sapp_android_JNIEnv_CallBooleanMethod(env, _sapp.android.decor_view, request_focus);
         // ime_manager.showSoftInput(decor_view, 0);
-        jmethodID show_soft_input = (*env)->GetMethodID(
-            env,
-            input_method_manager_class,
-            "showSoftInput",
-            "(Landroid/view/View;I)Z"
-            );
-        (*env)->CallBooleanMethod(
-            env,
-            _sapp.android.ime_manager,
-            show_soft_input,
-            _sapp.android.decor_view,
-            0
-            );
+        jmethodID show_soft_input = _sapp_android_JNIEnv_GetMethodID(env, input_method_manager_class, "showSoftInput", "(Landroid/view/View;I)Z");
+        _sapp_android_JNIEnv_CallBooleanMethod(env, _sapp.android.ime_manager, show_soft_input, _sapp.android.decor_view, 0);
     }
     else {
         // token = decor_view.getWindowToken();
-        jmethodID get_window_token = (*env)->GetMethodID(
-            env,
-            view_class,
-            "getWindowToken",
-            "()Landroid/os/IBinder;"
-            );
-        jobject token = (*env)->CallObjectMethod(
-            env,
-            _sapp.android.decor_view,
-            get_window_token
-            );
+        jmethodID get_window_token = _sapp_android_JNIEnv_GetMethodID(env, view_class, "getWindowToken", "()Landroid/os/IBinder;");
+        jobject token = _sapp_android_JNIEnv_CallObjectMethod(env, _sapp.android.decor_view, get_window_token);
 
         // ime_manager.hideSoftInputFromWindow(token, 0);
-        jmethodID hide_soft_input = (*env)->GetMethodID(
-            env,
-            input_method_manager_class,
-            "hideSoftInputFromWindow",
-            "(Landroid/os/IBinder;I)Z"
-            );
-        (*env)->CallBooleanMethod(
-            env,
-            _sapp.android.ime_manager,
-            hide_soft_input,
-            token,
-            0
-            );
-
-        (*env)->DeleteLocalRef(env, token);
+        jmethodID hide_soft_input = _sapp_android_JNIEnv_GetMethodID(env, input_method_manager_class, "hideSoftInputFromWindow", "(Landroid/os/IBinder;I)Z");
+        _sapp_android_JNIEnv_CallBooleanMethod(env, _sapp.android.ime_manager, hide_soft_input, token, 0);
+        _sapp_android_JNIEnv_DeleteLocalRef(env, token);
     }
-
-    (*env)->DeleteLocalRef(env, view_class);
-    (*env)->DeleteLocalRef(env, input_method_manager_class);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, view_class);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, input_method_manager_class);
 
     if (need_detach) {
-        (*_sapp.android.activity->vm)->DetachCurrentThread(_sapp.android.activity->vm);
+        _sapp_android_JavaVM_DetachCurrentThread(_sapp.android.activity->vm);
     }
 }
 
@@ -9416,107 +9568,49 @@ _SOKOL_PRIVATE bool _sapp_android_keyboard_shown() {
     // and we compare it to the view visible display frame
     // If they are not equal, then the keyboard may be visible
 
-    jclass view_class = (*env)->FindClass(env, "android/view/View");
+    jclass view_class = _sapp_android_JNIEnv_FindClass(env, "android/view/View");
 
     // view_height = decor_view.getHeight();
-    jmethodID get_display = (*env)->GetMethodID(
-        env,
-        view_class,
-        "getDisplay",
-        "()Landroid/view/Display;"
-        );
-    jobject display = (*env)->CallObjectMethod(
-        env,
-        _sapp.android.decor_view,
-        get_display
-        );
+    jmethodID get_display = _sapp_android_JNIEnv_GetMethodID(env, view_class, "getDisplay", "()Landroid/view/Display;");
+    jobject display = _sapp_android_JNIEnv_CallObjectMethod(env, _sapp.android.decor_view, get_display);
 
     // display_dimension = new Point();
-    jclass point_class = (*env)->FindClass(env, "android/graphics/Point");
-    jmethodID point_ctor = (*env)->GetMethodID(
-        env,
-        point_class,
-        "<init>",
-        "()V"
-        );
-    jobject display_dimension = (*env)->NewObject(env, point_class, point_ctor);
+    jclass point_class = _sapp_android_JNIEnv_FindClass(env, "android/graphics/Point");
+    jmethodID point_ctor = _sapp_android_JNIEnv_GetMethodID(env, point_class, "<init>", "()V");
+    jobject display_dimension = _sapp_android_JNIEnv_NewObject(env, point_class, point_ctor);
 
     // display.getSize(display_dimension);
-    jclass display_class = (*env)->FindClass(env, "android/view/Display");
-    jmethodID get_size = (*env)->GetMethodID(
-        env,
-        display_class,
-        "getSize",
-        "(Landroid/graphics/Point;)V"
-        );
-    (*env)->CallVoidMethod(
-        env,
-        display,
-        get_size,
-        display_dimension
-        );
+    jclass display_class = _sapp_android_JNIEnv_FindClass(env, "android/view/Display");
+    jmethodID get_size = _sapp_android_JNIEnv_GetMethodID(env, display_class, "getSize", "(Landroid/graphics/Point;)V");
+    _sapp_android_JNIEnv_CallVoidMethod(env, display, get_size, display_dimension);
 
     // display_height = display_dimension.y;
-    jfieldID point_y = (*env)->GetFieldID(
-        env,
-        point_class,
-        "y",
-        "I"
-        );
-    int display_height = (*env)->GetIntField(env, display_dimension, point_y);
+    jfieldID point_y = _sapp_android_JNIEnv_GetFieldID(env, point_class, "y", "I");
+    int display_height = _sapp_android_JNIEnv_GetIntField(env, display_dimension, point_y);
 
     // view_visible_rect = new Rect();
-    jclass rect_class = (*env)->FindClass(env, "android/graphics/Rect");
-    jmethodID rect_ctor = (*env)->GetMethodID(
-        env,
-        rect_class,
-        "<init>",
-        "()V"
-        );
-    jobject view_visible_rect = (*env)->NewObject(env, rect_class, rect_ctor);
+    jclass rect_class = _sapp_android_JNIEnv_FindClass(env, "android/graphics/Rect");
+    jmethodID rect_ctor = _sapp_android_JNIEnv_GetMethodID(env, rect_class, "<init>", "()V");
+    jobject view_visible_rect = _sapp_android_JNIEnv_NewObject(env, rect_class, rect_ctor);
 
     // decor_view.getWindowVisibleDisplayFrame(view_visible_rect);
-    jmethodID get_window_visible_display_frame = (*env)->GetMethodID(
-        env,
-        view_class,
-        "getWindowVisibleDisplayFrame",
-        "(Landroid/graphics/Rect;)V"
-        );
-    (*env)->CallVoidMethod(
-        env,
-        _sapp.android.decor_view,
-        get_window_visible_display_frame,
-        view_visible_rect
-        );
+    jmethodID get_window_visible_display_frame = _sapp_android_JNIEnv_GetMethodID(env, view_class, "getWindowVisibleDisplayFrame", "(Landroid/graphics/Rect;)V");
+    _sapp_android_JNIEnv_CallVoidMethod(env, _sapp.android.decor_view, get_window_visible_display_frame, view_visible_rect);
 
     // status_bar_height = view_visible_rect.top;
-    jfieldID rect_top = (*env)->GetFieldID(
-        env,
-        rect_class,
-        "top",
-        "I"
-        );
-    int status_bar_height = (*env)->GetIntField(env, view_visible_rect, rect_top);
+    jfieldID rect_top = _sapp_android_JNIEnv_GetFieldID(env, rect_class, "top", "I");
+    int status_bar_height = _sapp_android_JNIEnv_GetIntField(env, view_visible_rect, rect_top);
 
     // view_visible_height = view_visible_rect.height();
-    jmethodID rect_height = (*env)->GetMethodID(
-        env,
-        rect_class,
-        "height",
-        "()I"
-        );
-    int view_visible_height = (*env)->CallIntMethod(
-        env,
-        view_visible_rect,
-        rect_height
-        );
+    jmethodID rect_height = _sapp_android_JNIEnv_GetMethodID(env, rect_class, "height", "()I");
+    int view_visible_height = _sapp_android_JNIEnv_CallIntMethod(env, view_visible_rect, rect_height);
 
-    (*env)->DeleteLocalRef(env, view_visible_rect);
-    (*env)->DeleteLocalRef(env, rect_class);
-    (*env)->DeleteLocalRef(env, view_class);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, view_visible_rect);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, rect_class);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, view_class);
 
     if (need_detach) {
-        (*_sapp.android.activity->vm)->DetachCurrentThread(_sapp.android.activity->vm);
+        _sapp_android_JavaVM_DetachCurrentThread(_sapp.android.activity->vm);
     }
 
     return display_height - status_bar_height != view_visible_height;
@@ -9704,11 +9798,11 @@ _SOKOL_PRIVATE void _sapp_android_on_destroy(ANativeActivity* activity) {
     close(_sapp.android.pt.write_from_main_fd);
 
     JNIEnv *env = _sapp.android.activity->env;
-    (*env)->DeleteGlobalRef(env, _sapp.android.ime_manager);
-    (*env)->DeleteGlobalRef(env, _sapp.android.decor_view);
+    _sapp_android_JNIEnv_DeleteGlobalRef(env, _sapp.android.ime_manager);
+    _sapp_android_JNIEnv_DeleteGlobalRef(env, _sapp.android.decor_view);
 
     if (_sapp.android.clipboard_manager != NULL) {
-        (*env)->DeleteGlobalRef(env, _sapp.android.clipboard_manager);
+        _sapp_android_JNIEnv_DeleteGlobalRef(env, _sapp.android.clipboard_manager);
     }
 
     SAPP_LOG("NativeActivity done");
@@ -9747,100 +9841,49 @@ void ANativeActivity_onCreate(ANativeActivity* activity, void* saved_state, size
     JNIEnv *env = activity->env;
 
     // getSystemService() can only be called from the UI thread, so get everything we need here
-    jclass native_activity_class = (*env)->FindClass(env, "android/app/NativeActivity");
-    jclass context_class = (*env)->FindClass(env, "android/content/Context");
-    jmethodID get_system_service = (*env)->GetMethodID(
-        env,
-        native_activity_class,
-        "getSystemService",
-        "(Ljava/lang/String;)Ljava/lang/Object;"
-        );
+    jclass native_activity_class = _sapp_android_JNIEnv_FindClass(env, "android/app/NativeActivity");
+    jclass context_class = _sapp_android_JNIEnv_FindClass(env, "android/content/Context");
+    jmethodID get_system_service = _sapp_android_JNIEnv_GetMethodID(env, native_activity_class, "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;");
 
     // Get input method manager
     // this.getSystemService(Context.INPUT_METHOD_SERVICE);
-    jfieldID input_method_service_id = (*env)->GetStaticFieldID(
-        env,
-        context_class,
-        "INPUT_METHOD_SERVICE",
-        "Ljava/lang/String;"
-        );
-    jstring input_method_service_str = (*env)->GetStaticObjectField(
-        env,
-        context_class,
-        input_method_service_id
-        );
-    jobject ime_manager = (*env)->CallObjectMethod(
-        env,
-        _sapp.android.activity->clazz,
-        get_system_service,
-        input_method_service_str
-        );
+    jfieldID input_method_service_id = _sapp_android_JNIEnv_GetStaticFieldID(env, context_class, "INPUT_METHOD_SERVICE", "Ljava/lang/String;");
+    jobject input_method_service_field = _sapp_android_JNIEnv_GetStaticObjectField(env, context_class, input_method_service_id);
+    jobject ime_manager = _sapp_android_JNIEnv_CallObjectMethod(env, _sapp.android.activity->clazz, get_system_service, input_method_service_field);
 
-    _sapp.android.ime_manager = (*env)->NewGlobalRef(env, ime_manager);
+    _sapp.android.ime_manager = _sapp_android_JNIEnv_NewGlobalRef(env, ime_manager);
 
-    (*env)->DeleteLocalRef(env, ime_manager);
-    (*env)->DeleteLocalRef(env, input_method_service_str);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, ime_manager);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, input_method_service_field);
 
     // Get clipboard manager
     if (_sapp.clipboard.enabled && (_sapp.clipboard.buf_size > 0)) {
         // this.getSystemService(Context.CLIPBOARD_SERVICE);
-        jfieldID clipboard_service_id = (*env)->GetStaticFieldID(
-            env,
-            context_class,
-            "CLIPBOARD_SERVICE",
-            "Ljava/lang/String;"
-            );
-        jstring clipboard_service_str = (*env)->GetStaticObjectField(
-            env,
-            context_class,
-            clipboard_service_id
-            );
-        jobject clipboard_manager = (*env)->CallObjectMethod(
-            env,
-            _sapp.android.activity->clazz,
-            get_system_service,
-            clipboard_service_str
-            );
-        _sapp.android.clipboard_manager = (*env)->NewGlobalRef(env, clipboard_manager);
+        jfieldID clipboard_service_id = _sapp_android_JNIEnv_GetStaticFieldID(env, context_class, "CLIPBOARD_SERVICE", "Ljava/lang/String;");
+        jobject clipboard_service_field = _sapp_android_JNIEnv_GetStaticObjectField(env, context_class, clipboard_service_id);
+        jobject clipboard_manager = _sapp_android_JNIEnv_CallObjectMethod(env, _sapp.android.activity->clazz, get_system_service, clipboard_service_field);
+        _sapp.android.clipboard_manager = _sapp_android_JNIEnv_NewGlobalRef(env, clipboard_manager);
 
-        (*env)->DeleteLocalRef(env, clipboard_manager);
-        (*env)->DeleteLocalRef(env, clipboard_service_str);
+        _sapp_android_JNIEnv_DeleteLocalRef(env, clipboard_manager);
+        _sapp_android_JNIEnv_DeleteLocalRef(env, clipboard_service_field);
     }
 
     // window = this.getWindow();
-    jmethodID get_window = (*env)->GetMethodID(
-        env,
-        native_activity_class,
-        "getWindow",
-        "()Landroid/view/Window;"
-        );
-    jobject window = (*env)->CallObjectMethod(
-        env,
-        _sapp.android.activity->clazz,
-        get_window
-        );
+    jmethodID get_window = _sapp_android_JNIEnv_GetMethodID(env, native_activity_class, "getWindow", "()Landroid/view/Window;");
+    jobject window = _sapp_android_JNIEnv_CallObjectMethod(env, _sapp.android.activity->clazz, get_window);
 
     // decor_view = window.getDecorView();
-    jclass window_class = (*env)->FindClass(env, "android/view/Window");
-    jmethodID get_decor_view = (*env)->GetMethodID(
-        env,
-        window_class,
-        "getDecorView",
-        "()Landroid/view/View;"
-        );
-    jobject decor_view = (*env)->CallObjectMethod(
-        env,
-        window,
-        get_decor_view
-        );
+    jclass window_class = _sapp_android_JNIEnv_FindClass(env, "android/view/Window");
+    jmethodID get_decor_view = _sapp_android_JNIEnv_GetMethodID(env, window_class, "getDecorView", "()Landroid/view/View;");
+    jobject decor_view = _sapp_android_JNIEnv_CallObjectMethod(env, window, get_decor_view);
 
-    _sapp.android.decor_view = (*env)->NewGlobalRef(env, decor_view);
+    _sapp.android.decor_view = _sapp_android_JNIEnv_NewGlobalRef(env, decor_view);
 
-    (*env)->DeleteLocalRef(env, decor_view);
-    (*env)->DeleteLocalRef(env, window_class);
-    (*env)->DeleteLocalRef(env, window);
-    (*env)->DeleteLocalRef(env, context_class);
-    (*env)->DeleteLocalRef(env, native_activity_class);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, decor_view);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, window_class);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, window);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, context_class);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, native_activity_class);
 
     pthread_mutex_init(&_sapp.android.pt.mutex, NULL);
     pthread_cond_init(&_sapp.android.pt.cond, NULL);
@@ -10003,51 +10046,30 @@ _SOKOL_PRIVATE void _sapp_android_set_clipboard_string(const char* str) {
     }
 
     // Create jstring
-    jstring label = (*env)->NewStringUTF(env, "");
+    jstring label = _sapp_android_JNIEnv_NewStringUTF(env, "");
     _sapp_android_utf8_to_mutf8(str, _sapp.clipboard.buffer, _sapp.clipboard.buf_size);
-    jstring text = (*env)->NewStringUTF(env, _sapp.clipboard.buffer);
+    jstring text = _sapp_android_JNIEnv_NewStringUTF(env, _sapp.clipboard.buffer);
 
     // Create clip data
     // clipdata_instance = ClipData.newPlainText(label, text);
-    jclass clipdata_class = (*env)->FindClass(env, "android/content/ClipData");
-    jmethodID clipdata_new_plain_text = (*env)->GetStaticMethodID(
-        env,
-        clipdata_class,
-        "newPlainText",
-        "(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Landroid/content/ClipData;"
-        );
-    jobject clipdata_instance = (*env)->CallStaticObjectMethod(
-        env,
-        clipdata_class,
-        clipdata_new_plain_text,
-        label,
-        text
-        );
+    jclass clipdata_class = _sapp_android_JNIEnv_FindClass(env, "android/content/ClipData");
+    jmethodID clipdata_new_plain_text = _sapp_android_JNIEnv_GetStaticMethodID(env, clipdata_class, "newPlainText", "(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Landroid/content/ClipData;");
+    jobject clipdata_instance = _sapp_android_JNIEnv_CallStaticObjectMethod(env, clipdata_class, clipdata_new_plain_text, label, text);
 
     // Set clipboard content
     // clipboard_manager.setPrimaryClip(clipdata_instance);
-    jclass clipboard_manager_class = (*env)->FindClass(env, "android/content/ClipboardManager");
-    jmethodID set_primary_clip = (*env)->GetMethodID(
-        env,
-        clipboard_manager_class,
-        "setPrimaryClip",
-        "(Landroid/content/ClipData;)V"
-        );
-    (*env)->CallVoidMethod(
-        env,
-        _sapp.android.clipboard_manager,
-        set_primary_clip,
-        clipdata_instance
-        );
+    jclass clipboard_manager_class = _sapp_android_JNIEnv_FindClass(env, "android/content/ClipboardManager");
+    jmethodID set_primary_clip = _sapp_android_JNIEnv_GetMethodID(env, clipboard_manager_class, "setPrimaryClip", "(Landroid/content/ClipData;)V");
+    _sapp_android_JNIEnv_CallVoidMethod(env, _sapp.android.clipboard_manager, set_primary_clip, clipdata_instance);
 
-    (*env)->DeleteLocalRef(env, clipboard_manager_class);
-    (*env)->DeleteLocalRef(env, clipdata_instance);
-    (*env)->DeleteLocalRef(env, clipdata_class);
-    (*env)->DeleteLocalRef(env, text);
-    (*env)->DeleteLocalRef(env, label);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, clipboard_manager_class);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, clipdata_instance);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, clipdata_class);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, text);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, label);
 
     if (need_detach) {
-        (*_sapp.android.activity->vm)->DetachCurrentThread(_sapp.android.activity->vm);
+        _sapp_android_JavaVM_DetachCurrentThread(_sapp.android.activity->vm);
     }
 }
 
@@ -10063,101 +10085,54 @@ _SOKOL_PRIVATE const char* _sapp_android_get_clipboard_string(void) {
 
     // Get clipboard content
     // clipdata = clipboard_manager.getPrimaryClip();
-    jclass clipboard_manager_class = (*env)->FindClass(env, "android/content/ClipboardManager");
-    jmethodID get_primary_clip = (*env)->GetMethodID(
-        env,
-        clipboard_manager_class,
-        "getPrimaryClip",
-        "()Landroid/content/ClipData;"
-        );
-    jobject clipdata = (*env)->CallObjectMethod(
-        env,
-        _sapp.android.clipboard_manager,
-        get_primary_clip
-        );
+    jclass clipboard_manager_class = _sapp_android_JNIEnv_FindClass(env, "android/content/ClipboardManager");
+    jmethodID get_primary_clip = _sapp_android_JNIEnv_GetMethodID(env, clipboard_manager_class, "getPrimaryClip", "()Landroid/content/ClipData;");
+    jobject clipdata = _sapp_android_JNIEnv_CallObjectMethod(env, _sapp.android.clipboard_manager, get_primary_clip);
 
     // Get clipdata item
     // item_count = clipdata.getItemCount();
-    jclass clipdata_class = (*env)->FindClass(env, "android/content/ClipData");
-    jmethodID get_item_count = (*env)->GetMethodID(
-        env,
-        clipdata_class,
-        "getItemCount",
-        "()I"
-        );
-    int item_count = (*env)->CallIntMethod(
-        env,
-        clipdata,
-        get_item_count
-        );
+    jclass clipdata_class = _sapp_android_JNIEnv_FindClass(env, "android/content/ClipData");
+    jmethodID get_item_count = _sapp_android_JNIEnv_GetMethodID(env, clipdata_class, "getItemCount", "()I");
+    int item_count = _sapp_android_JNIEnv_CallIntMethod(env, clipdata, get_item_count);
 
     // TODO : merge all items in one text ?
     if (item_count != 0) {
         // item = clipdata.getItemAt(0);
-        jmethodID get_item_at = (*env)->GetMethodID(
-            env,
-            clipdata_class,
-            "getItemAt",
-            "(I)Landroid/content/ClipData$Item;"
-            );
-        jobject item = (*env)->CallObjectMethod(
-            env,
-            clipdata,
-            get_item_at,
-            0
-            );
+        jmethodID get_item_at = _sapp_android_JNIEnv_GetMethodID(env, clipdata_class, "getItemAt", "(I)Landroid/content/ClipData$Item;");
+        jobject item = _sapp_android_JNIEnv_CallObjectMethod(env, clipdata, get_item_at, 0);
 
         // Retrieve text
         // item_sequence = item.coerceToText();
-        jclass clipdata_item_class = (*env)->FindClass(env, "android/content/ClipData$Item");
-        jmethodID coerce_to_text = (*env)->GetMethodID(
-            env,
-            clipdata_item_class,
-            "coerceToText",
-            "(Landroid/content/Context;)Ljava/lang/CharSequence;"
-            );
+        jclass clipdata_item_class = _sapp_android_JNIEnv_FindClass(env, "android/content/ClipData$Item");
+        jmethodID coerce_to_text = _sapp_android_JNIEnv_GetMethodID(env, clipdata_item_class, "coerceToText", "(Landroid/content/Context;)Ljava/lang/CharSequence;");
 
-        jobject item_sequence  = (*env)->CallObjectMethod(
-            env,
-            item,
-            coerce_to_text,
-            _sapp.android.activity->clazz
-            );
+        jobject item_sequence  = _sapp_android_JNIEnv_CallObjectMethod(env, item, coerce_to_text, _sapp.android.activity->clazz);
 
         // item_text = item_sequence.toString();
-        jclass charsequence_class = (*env)->FindClass(env, "java/lang/CharSequence");
-        jmethodID to_string = (*env)->GetMethodID(
-            env,
-            charsequence_class,
-            "toString",
-            "()Ljava/lang/String;"
-            );
+        jclass charsequence_class = _sapp_android_JNIEnv_FindClass(env, "java/lang/CharSequence");
+        jmethodID to_string = _sapp_android_JNIEnv_GetMethodID(env, charsequence_class, "toString", "()Ljava/lang/String;");
 
-        jstring item_text = (*env)->CallObjectMethod(
-            env,
-            item_sequence,
-            to_string
-            );
+        jstring item_text = (jstring)_sapp_android_JNIEnv_CallObjectMethod(env, item_sequence, to_string);
 
         // Update buffer
-        const char *text = (*env)->GetStringUTFChars(env, item_text, NULL);
+        const char *text = _sapp_android_JNIEnv_GetStringUTFChars(env, item_text, NULL);
         _sapp_android_mutf8_to_utf8(text, _sapp.clipboard.buffer, _sapp.clipboard.buf_size);
 
         // Cleanup
-        (*env)->ReleaseStringUTFChars(env, item_text, text);
-        (*env)->DeleteLocalRef(env, item_text);
-        (*env)->DeleteLocalRef(env, charsequence_class);
-        (*env)->DeleteLocalRef(env, item_sequence);
-        (*env)->DeleteLocalRef(env, clipdata_item_class);
-        (*env)->DeleteLocalRef(env, item);
+        _sapp_android_JNIEnv_ReleaseStringUTFChars(env, item_text, text);
+        _sapp_android_JNIEnv_DeleteLocalRef(env, item_text);
+        _sapp_android_JNIEnv_DeleteLocalRef(env, charsequence_class);
+        _sapp_android_JNIEnv_DeleteLocalRef(env, item_sequence);
+        _sapp_android_JNIEnv_DeleteLocalRef(env, clipdata_item_class);
+        _sapp_android_JNIEnv_DeleteLocalRef(env, item);
     }
 
-    (*env)->DeleteLocalRef(env, clipdata_class);
-    (*env)->DeleteLocalRef(env, clipdata);
-    (*env)->DeleteLocalRef(env, clipboard_manager_class);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, clipdata_class);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, clipdata);
+    _sapp_android_JNIEnv_DeleteLocalRef(env, clipboard_manager_class);
 
     if (need_detach) {
-        (*_sapp.android.activity->vm)->DetachCurrentThread(_sapp.android.activity->vm);
+        _sapp_android_JavaVM_DetachCurrentThread(_sapp.android.activity->vm);
     }
 
     return _sapp.clipboard.buffer;
