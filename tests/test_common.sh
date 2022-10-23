@@ -141,6 +141,16 @@ build_android() {
     cd ../..
 }
 
+analyze_android() {
+    cfg=$1
+    backend=$2
+    mode=$3
+    mkdir -p build/$cfg && cd build/$cfg
+    cmake -GNinja -DSOKOL_BACKEND=$backend -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-28 -DCMAKE_TOOLCHAIN_FILE=../android_sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DCMAKE_BUILD_TYPE=$mode -DUSE_ANALYZER=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ ../..
+    cmake --build .
+    cd ../..
+}
+
 runtest() {
     cfg=$1
     cd build/$cfg
