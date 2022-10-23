@@ -9922,7 +9922,7 @@ _SOKOL_PRIVATE void _sapp_android_utf8_to_mutf8(const char* src, char *dst, int 
             }
         }
         else {
-            uint32_t c = 0;
+            int c = 0;
             c |= (src[src_offset++] & 0x07) << 18;
             c |= (src[src_offset++] & 0x3F) << 12;
             c |= (src[src_offset++] & 0x3F) << 6;
@@ -9968,7 +9968,7 @@ _SOKOL_PRIVATE void _sapp_android_mutf8_to_utf8(const char* src, char *dst, int 
 
         if (src[src_offset] == (char)0xED) {
             ++src_offset;
-            uint32_t c = 0;
+            int c = 0;
             c |= (src[src_offset++] & 0x0F) << 16;
             c |= (src[src_offset++] & 0x3F) << 10;
             SOKOL_ASSERT(src[src_offset] == (char)0xED);
