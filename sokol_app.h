@@ -132,7 +132,7 @@
     mouse hide          | YES     | YES   | YES   | ---   | ---     | YES  | YES
     mouse lock          | YES     | YES   | YES   | ---   | ---     | TODO | YES
     set cursor type     | YES     | YES   | YES   | ---   | ---     | YES  | YES
-    screen keyboard     | ---     | ---   | ---   | YES   | TODO    | TODO | YES
+    screen keyboard     | ---     | ---   | ---   | YES   | YES     | TODO | YES
     swap interval       | YES     | YES   | YES   | YES   | TODO    | ---  | YES
     high-dpi            | YES     | YES   | TODO  | YES   | YES     | YES  | YES
     clipboard           | YES     | YES   | TODO  | ---   | YES     | TODO | YES
