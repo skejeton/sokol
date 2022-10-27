@@ -9597,9 +9597,13 @@ _SOKOL_PRIVATE bool _sapp_android_keyboard_shown() {
     jmethodID get_window_visible_display_frame = _sapp_android_JNIEnv_GetMethodID(env, view_class, "getWindowVisibleDisplayFrame", "(Landroid/graphics/Rect;)V");
     _sapp_android_JNIEnv_CallVoidMethod(env, _sapp.android.decor_view, get_window_visible_display_frame, view_visible_rect);
 
+    // NOTE: looking at view_visible_rect.top is useless, this is 136 on my Google Pixel 4
+    // yet the display_height is still equal to the view_visible_height, instead
+    // we just assume that the keyboard is at least 256 pixels high
+    //
     // status_bar_height = view_visible_rect.top;
-    jfieldID rect_top = _sapp_android_JNIEnv_GetFieldID(env, rect_class, "top", "I");
-    int status_bar_height = _sapp_android_JNIEnv_GetIntField(env, view_visible_rect, rect_top);
+    //jfieldID rect_top = _sapp_android_JNIEnv_GetFieldID(env, rect_class, "top", "I");
+    //int status_bar_height = _sapp_android_JNIEnv_GetIntField(env, view_visible_rect, rect_top);
 
     // view_visible_height = view_visible_rect.height();
     jmethodID rect_height = _sapp_android_JNIEnv_GetMethodID(env, rect_class, "height", "()I");
@@ -9613,7 +9617,9 @@ _SOKOL_PRIVATE bool _sapp_android_keyboard_shown() {
         _sapp_android_JavaVM_DetachCurrentThread(_sapp.android.activity->vm);
     }
 
-    return display_height - status_bar_height != view_visible_height;
+    const int min_keyboard_height = 256;
+    const bool shown = (view_visible_height + min_keyboard_height) < display_height;
+    return shown;
 }
 
 _SOKOL_PRIVATE void* _sapp_android_loop(void* arg) {
