@@ -9319,25 +9319,25 @@ _SOKOL_PRIVATE bool _sapp_android_key_event(const AInputEvent* e) {
     int32_t meta = AKeyEvent_getMetaState(e);
     uint32_t modifiers = 0;
 
-    if ((meta & AMETA_SHIFT_ON)) {
+    if (0 != (meta & AMETA_SHIFT_ON)) {
         modifiers |= SAPP_MODIFIER_SHIFT;
     }
 
-    if ((meta & AMETA_CTRL_ON)) {
+    if (0 != (meta & AMETA_CTRL_ON)) {
         modifiers |= SAPP_MODIFIER_CTRL;
     }
 
-    if ((meta & AMETA_ALT_ON)) {
+    if (0 != (meta & AMETA_ALT_ON)) {
         modifiers |= SAPP_MODIFIER_ALT;
     }
 
-    if ((meta & AMETA_META_ON)) {
+    if (0 != (meta & AMETA_META_ON)) {
         modifiers |= SAPP_MODIFIER_SUPER;
     }
 
     sapp_keycode translated_key_code = _sapp_translate_key(key_code);
 
-    if(action != AKEY_EVENT_ACTION_MULTIPLE) {
+    if (action != AKEY_EVENT_ACTION_MULTIPLE) {
         _sapp_init_event(event_type);
         _sapp.event.modifiers = modifiers;
         _sapp.event.key_code = translated_key_code;
@@ -9346,7 +9346,7 @@ _SOKOL_PRIVATE bool _sapp_android_key_event(const AInputEvent* e) {
     }
     else {
         /* AKEY_EVENT_ACTION_MULTIPLE means that multiple down/up pairs have occured in this key event */
-        for(int key_repeat = 0; key_repeat < AKeyEvent_getRepeatCount(e); ++key_repeat) {
+        for (int key_repeat = 0; key_repeat < AKeyEvent_getRepeatCount(e); ++key_repeat) {
             _sapp_init_event(SAPP_EVENTTYPE_KEY_DOWN);
             _sapp.event.modifiers = modifiers;
             _sapp.event.key_code = translated_key_code;
