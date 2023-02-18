@@ -2532,12 +2532,28 @@ typedef struct sg_buffer_info {
 } sg_buffer_info;
 
 typedef struct sg_image_info {
-    sg_slot_info slot;              /* resource pool slot info */
-    uint32_t upd_frame_index;       /* frame index of last sg_update_image() */
-    int num_slots;                  /* number of renaming-slots for dynamically updated images */
-    int active_slot;                /* currently active write-slot for dynamically updated images */
-    int width;                      /* image width */
-    int height;                     /* image height */
+    sg_slot_info slot;              // resource pool slot info
+    uint32_t upd_frame_index;       // frame index of last sg_update_image()
+    int num_slots;                  // number of renaming-slots for dynamically updated images
+    int active_slot;                // currently active write-slot for dynamically updated images
+    sg_image_type type;
+    bool render_target;
+    int width;
+    int height;
+    int num_slices;
+    int num_mipmaps;
+    sg_usage usage;
+    sg_pixel_format pixel_format;
+    int sample_count;
+    sg_filter min_filter;
+    sg_filter mag_filter;
+    sg_wrap wrap_u;
+    sg_wrap wrap_v;
+    sg_wrap wrap_w;
+    sg_border_color border_color;
+    uint32_t max_anisotropy;
+    float min_lod;
+    float max_lod;
 } sg_image_info;
 
 typedef struct sg_shader_info {
@@ -3741,6 +3757,9 @@ _SOKOL_PRIVATE void _sg_buffer_common_init(_sg_buffer_common_t* cmn, const sg_bu
 }
 
 typedef struct {
+    uint32_t upd_frame_index;
+    int num_slots;
+    int active_slot;
     sg_image_type type;
     bool render_target;
     int width;
@@ -3757,12 +3776,14 @@ typedef struct {
     sg_wrap wrap_w;
     sg_border_color border_color;
     uint32_t max_anisotropy;
-    uint32_t upd_frame_index;
-    int num_slots;
-    int active_slot;
+    float min_lod;
+    float max_lod;
 } _sg_image_common_t;
 
 _SOKOL_PRIVATE void _sg_image_common_init(_sg_image_common_t* cmn, const sg_image_desc* desc) {
+    cmn->upd_frame_index = 0;
+    cmn->num_slots = (desc->usage == SG_USAGE_IMMUTABLE) ? 1 : SG_NUM_INFLIGHT_FRAMES;
+    cmn->active_slot = 0;
     cmn->type = desc->type;
     cmn->render_target = desc->render_target;
     cmn->width = desc->width;
@@ -3779,9 +3800,8 @@ _SOKOL_PRIVATE void _sg_image_common_init(_sg_image_common_t* cmn, const sg_imag
     cmn->wrap_w = desc->wrap_w;
     cmn->border_color = desc->border_color;
     cmn->max_anisotropy = desc->max_anisotropy;
-    cmn->upd_frame_index = 0;
-    cmn->num_slots = (cmn->usage == SG_USAGE_IMMUTABLE) ? 1 : SG_NUM_INFLIGHT_FRAMES;
-    cmn->active_slot = 0;
+    cmn->min_lod = desc->min_lod;
+    cmn->max_lod = desc->max_lod;
 }
 
 typedef struct {
@@ -16777,13 +16797,8 @@ SOKOL_API_IMPL sg_buffer_info sg_query_buffer_info(sg_buffer buf_id) {
         info.append_frame_index = buf->cmn.append_frame_index;
         info.append_pos = buf->cmn.append_pos;
         info.append_overflow = buf->cmn.append_overflow;
-        #if defined(SOKOL_D3D11)
-        info.num_slots = 1;
-        info.active_slot = 0;
-        #else
         info.num_slots = buf->cmn.num_slots;
         info.active_slot = buf->cmn.active_slot;
-        #endif
     }
     return info;
 }
@@ -16798,15 +16813,26 @@ SOKOL_API_IMPL sg_image_info sg_query_image_info(sg_image img_id) {
         info.slot.res_id = img->slot.id;
         info.slot.ctx_id = img->slot.ctx_id;
         info.upd_frame_index = img->cmn.upd_frame_index;
-        #if defined(SOKOL_D3D11)
-        info.num_slots = 1;
-        info.active_slot = 0;
-        #else
         info.num_slots = img->cmn.num_slots;
         info.active_slot = img->cmn.active_slot;
-        #endif
+        info.type = img->cmn.type;
+        info.render_target = img->cmn.render_target;
         info.width = img->cmn.width;
         info.height = img->cmn.height;
+        info.num_slices = img->cmn.num_slices;
+        info.num_mipmaps = img->cmn.num_mipmaps;
+        info.usage = img->cmn.usage;
+        info.pixel_format = img->cmn.pixel_format;
+        info.sample_count = img->cmn.sample_count;
+        info.min_filter = img->cmn.min_filter;
+        info.mag_filter = img->cmn.mag_filter;
+        info.wrap_u = img->cmn.wrap_u;
+        info.wrap_v = img->cmn.wrap_v;
+        info.wrap_w = img->cmn.wrap_w;
+        info.border_color = img->cmn.border_color;
+        info.max_anisotropy = img->cmn.max_anisotropy;
+        info.min_lod = img->cmn.min_lod;
+        info.max_lod = img->cmn.max_lod;
     }
     return info;
 }
